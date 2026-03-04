@@ -33,6 +33,7 @@ const sectorLabel: Record<Sector, string> = {
   COMERCIO: "Comércio",
   SERVICOS: "Serviços",
   INDUSTRIA: "Indústria",
+  NAO_SEI: "Não sei",
 };
 
 function formatCurrency(v: number) {

@@ -6,10 +6,15 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js",
+    "build:azure": "tsc -p tsconfig.json",
+    "start": "node scripts/azure-start.mjs",
+    "start:prod": "pm2 start dist/index.js --no-daemon --name api",
     "db:migrate": "prisma migrate dev --name init",
     "db:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio"
+  },
+  "engines": {
+    "node": ">=20 <25"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
@@ -22,6 +27,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nanoid": "^5.0.7",
+    "pm2": "^5.4.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -10,11 +10,11 @@ const AccessPayloadSchema = z.object({
 export type AccessPayload = z.infer<typeof AccessPayloadSchema>;
 
 export function signAccessToken(payload: AccessPayload, expiresIn: string = "4h") {
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn });
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET as any, { expiresIn } as any);
 }
 
 export function signRefreshToken(payload: { sub: string }, expiresIn: string = "30d") {
-  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn });
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET as any, { expiresIn } as any);
 }
 
 export function verifyAccessToken(token: string) {

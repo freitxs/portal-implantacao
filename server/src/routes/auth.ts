@@ -21,7 +21,8 @@ router.post("/login", async (req, res, next) => {
     const ok = await verifyPassword(password, user.passwordHash);
     if (!ok) return res.status(401).json({ message: "E-mail ou senha inválidos." });
 
-    const accessToken = signAccessToken({ sub: user.id, role: user.role });
+    const role = (user.role === "ADMIN" || user.role === "CLIENT") ? user.role : "CLIENT";
+    const accessToken = signAccessToken({ sub: user.id, role });
     const refreshToken = signRefreshToken({ sub: user.id });
 
     // store refresh token hashed (simple session store)
@@ -60,7 +61,8 @@ router.post("/refresh", async (req, res, next) => {
     }
     if (!matched) return res.status(401).json({ message: "Sessão inválida." });
 
-    const accessToken = signAccessToken({ sub: user.id, role: user.role });
+    const role = (user.role === "ADMIN" || user.role === "CLIENT") ? user.role : "CLIENT";
+    const accessToken = signAccessToken({ sub: user.id, role });
     res.json({ accessToken, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (e) { next(e); }
 });
