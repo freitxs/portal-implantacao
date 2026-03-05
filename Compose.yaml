@@ -1,0 +1,23 @@
+services:
+  mssql-portal-implantacao:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: 'Root@#15'
+      MSSQL_SA_PASSWORD: 'Root@#15'
+      MSSQL_PID: 'Developer' 
+      MSSQL_TCP_PORT: 1433 
+    volumes:
+      - mssql_data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Root@#15", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mssql_data:
+    driver: local

@@ -7,30 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// SQLite no Prisma não suporta enum/Json.
-// Armazenamos enums como STRING e objetos JSON como STRING.
-
 model User {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  passwordHash  String
-  role          String   @default("CLIENT") // ADMIN | CLIENT
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CLIENT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  forms         OnboardingForm[]
-  sessions      RefreshSession[]
+  forms        OnboardingForm[]
+  sessions     RefreshSession[]
 }
 
 model RefreshSession {
-  id           String   @id @default(cuid())
-  userId       String
-  tokenHash    String
-  createdAt    DateTime @default(now())
-  expiresAt    DateTime
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -44,20 +41,33 @@ model OnboardingForm {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   pricing     PricingTable[]
   uploads     Upload[]
   history     SaveHistory[]
+  users       OnboardingUser[]
 
   @@index([userId])
   @@index([status])
 }
 
+model OnboardingUser {
+  id        String   @id @default(cuid())
+  formId    String
+  name      String
+  email     String
+  createdAt DateTime @default(now())
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@index([formId])
+}
+
 model PricingTable {
   id        String   @id @default(cuid())
   formId    String
-  sector    String   // COMERCIO | SERVICOS | INDUSTRIA | MISTO | NAO_SEI
-  regime    String   // SIMPLES | PRESUMIDO | REAL
+  sector    String
+  regime    String
   rows      String   @default("[]")
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
@@ -72,7 +82,7 @@ model PricingTable {
 model Upload {
   id        String   @id @default(cuid())
   formId    String
-  type      String   // CONTRATO | PROPOSTA
+  type      String
   filename  String
   path      String
   mimetype  String
@@ -97,8 +107,8 @@ model SaveHistory {
 
 model PricingTemplate {
   id        String   @id @default(cuid())
-  sector    String   // COMERCIO | SERVICOS | INDUSTRIA | MISTO | NAO_SEI
-  regime    String   // SIMPLES | PRESUMIDO | REAL
+  sector    String
+  regime    String
   rows      String   @default("[]")
   createdAt DateTime @default(now())
 

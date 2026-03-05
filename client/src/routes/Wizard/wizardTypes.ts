@@ -1,6 +1,28 @@
 import { z } from "zod";
 import type { Regime, PricingRow, Sector } from "../../types";
 
+export const EmailSetupSchema = z
+  .object({
+    emailProvider: z.string().max(120).optional().default(""),
+    users: z
+      .array(
+        z
+          .object({
+            name: z.string().max(120).optional().default(""),
+            email: z.string().max(200).optional().default(""),
+          })
+          .default({ name: "", email: "" })
+      )
+      .optional()
+      .default([{ name: "", email: "" }]),
+  })
+  .default({
+    emailProvider: "",
+    users: [{ name: "", email: "" }],
+  });
+
+export type EmailSetupValues = z.infer<typeof EmailSetupSchema>;
+
 export const OfficeSchema = z.object({
   officeName: z.string().min(2, "Informe o nome do escritório."),
   responsibleName: z.string().min(2, "Informe o nome do responsável."),

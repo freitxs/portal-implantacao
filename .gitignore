@@ -3,11 +3,13 @@ node_modules/
 
 # env
 .env
+.env.production
 **/.env
 
 # build
 dist/
 build/
+publish.zip
 
 # logs
 npm-debug.log*

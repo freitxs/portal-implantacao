@@ -22,6 +22,11 @@ export function AdminFormDetailPage() {
 
   const form = q.data?.form as any;
 
+  const emailStep = form?.stepData?.email ?? {};
+  const emailProvider: string = emailStep.emailProvider ?? "";
+  const emailUsers: Array<{ name?: string; email?: string }> = Array.isArray(emailStep.users) ? emailStep.users : [];
+
+
   const page1 = form?.stepData?.page1 ?? {};
   const systems = page1.systems ?? {};
   const systemsComment: string = page1.systemsComment ?? "";
@@ -74,6 +79,29 @@ export function AdminFormDetailPage() {
       </Stack>
 
       <Stack spacing={2}>
+        <Card>
+          <CardContent>
+            <Typography sx={{ fontWeight: 900 }}>E-mail e usuários</Typography>
+            <Divider sx={{ my: 1.5 }} />
+            <Typography color="text.secondary">
+              <strong>Provedor:</strong> {emailProvider ? emailProvider : "—"}
+            </Typography>
+            <Box sx={{ mt: 1.25, display: "grid", gap: 0.5 }}>
+              {emailUsers.filter((u) => (u?.name ?? "").trim() || (u?.email ?? "").trim()).length ? (
+                emailUsers
+                  .filter((u) => (u?.name ?? "").trim() || (u?.email ?? "").trim())
+                  .map((u, i) => (
+                    <Typography key={i} color="text.secondary">
+                      <strong>Usuário {i + 1}:</strong> {u?.name || "—"} • {u?.email || "—"}
+                    </Typography>
+                  ))
+              ) : (
+                <Typography color="text.secondary">—</Typography>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardContent>
             <Typography sx={{ fontWeight: 900 }}>Soluções utilizadas</Typography>

@@ -16,9 +16,9 @@ export type Upload = {
   formId: string;
   type: UploadType;
   filename: string;
-  path: string;
   mimetype: string;
   size: number;
+  path: string;
   createdAt: string;
 };
 
