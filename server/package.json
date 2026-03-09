@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
+    "prisma:prod": "prisma generate --schema prisma/schema.sqlserver.prisma && prisma migrate deploy --schema prisma/schema.sqlserver.prisma",
+    "postinstall": "npm run prisma:prod",
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev --name init",
     "db:seed": "tsx prisma/seed.ts",
