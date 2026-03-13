@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CLIENT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  forms        OnboardingForm[]
+  sessions     RefreshSession[]
+}
+
+model RefreshSession {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @db.NVarChar(Max)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OnboardingForm {
+  id          String   @id @default(cuid())
+  userId      String
+  status      String   @default("RASCUNHO")
+  currentStep Int      @default(0)
+  stepData    String   @default("{}") @db.NVarChar(Max)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pricing     PricingTable[]
+  uploads     Upload[]
+  history     SaveHistory[]
+  users       OnboardingUser[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OnboardingUser {
+  id        String   @id @default(cuid())
+  formId    String
+  name      String
+  email     String
+  createdAt DateTime @default(now())
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@index([formId])
+}
+
+model PricingTable {
+  id        String   @id @default(cuid())
+  formId    String
+  sector    String
+  regime    String
+  rows      String   @default("[]") @db.NVarChar(Max)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, sector, regime])
+  @@index([regime])
+  @@index([sector])
+}
+
+model Upload {
+  id        String   @id @default(cuid())
+  formId    String
+  type      String
+  filename  String
+  path      String   @db.NVarChar(Max)
+  mimetype  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, type])
+}
+
+model SaveHistory {
+  id        String   @id @default(cuid())
+  formId    String
+  stepIndex Int
+  savedAt   DateTime @default(now())
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@index([formId, savedAt])
+}
+
+model PricingTemplate {
+  id        String   @id @default(cuid())
+  sector    String
+  regime    String
+  rows      String   @default("[]") @db.NVarChar(Max)
+  createdAt DateTime @default(now())
+
+  @@unique([sector, regime])
+}

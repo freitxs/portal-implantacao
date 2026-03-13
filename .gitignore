@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# env
+.env
+**/.env
+
+# build
+dist/
+build/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# prisma local db
+server/prisma/dev.db
+server/prisma/*.db
+server/prisma/*.db-journal
+
+# uploads temporários, se existir
+uploads/
