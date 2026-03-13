@@ -18,7 +18,6 @@ export type Upload = {
   filename: string;
   mimetype: string;
   size: number;
-  path: string;
   createdAt: string;
 };
 

@@ -13,7 +13,7 @@ import { StepFactors } from "./steps/StepFactors";
 import { StepUploads } from "./steps/StepUploads";
 import { StepReview } from "./steps/StepReview";
 
-const steps = ["E-mail & usuários", "Sistemas", "Fatores & expectativa", "Uploads", "Revisão e envio"];
+const steps = ["Sistemas", "Fatores & expectativa", "E-mails, usuários & uploads", "Revisão e envio"];
 
 export function WizardPage() {
   const { formId } = useParams();
@@ -48,6 +48,10 @@ export function WizardPage() {
 
     setLocalStepData(form.stepData ?? {});
   }, [form?.id, form?.updatedAt]);
+
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeStep]);
 
   const saveStep = useMutation({
     mutationFn: async (payload: { stepIndex: number; data: any; currentStep?: number }) => {
@@ -105,48 +109,47 @@ export function WizardPage() {
       ) : (
         <Box sx={{ display: "grid", gap: 2 }}>
           {activeStep === 0 && (
-            <StepEmail
-              defaultValues={localStepData.email}
+            <StepSystems
+              defaultValues={localStepData.page1}
               onAutoSave={(data) => {
-                setLocalStepData((prev: any) => ({ ...prev, email: data }));
-                saveStep.mutate({ stepIndex: 0, data: { email: data }, currentStep: 1 });
+                setLocalStepData((prev: any) => ({ ...prev, page1: data }));
+                saveStep.mutate({ stepIndex: 0, data: { page1: data }, currentStep: 1 });
               }}
             />
           )}
 
           {activeStep === 1 && (
-            <StepSystems
-              defaultValues={localStepData.page1}
+            <StepFactors
+              defaultValues={localStepData.page2}
               onAutoSave={(data) => {
-                setLocalStepData((prev: any) => ({ ...prev, page1: data }));
-                saveStep.mutate({ stepIndex: 1, data: { page1: data }, currentStep: 2 });
+                setLocalStepData((prev: any) => ({ ...prev, page2: data }));
+                saveStep.mutate({ stepIndex: 1, data: { page2: data }, currentStep: 2 });
               }}
             />
           )}
 
           {activeStep === 2 && (
-            <StepFactors
-              defaultValues={localStepData.page2}
-              onAutoSave={(data) => {
-                setLocalStepData((prev: any) => ({ ...prev, page2: data }));
-                saveStep.mutate({ stepIndex: 2, data: { page2: data }, currentStep: 3 });
-              }}
-            />
+            <Stack spacing={2}>
+              <StepEmail
+                defaultValues={localStepData.email}
+                onAutoSave={(data) => {
+                  setLocalStepData((prev: any) => ({ ...prev, email: data }));
+                  saveStep.mutate({ stepIndex: 2, data: { email: data }, currentStep: 3 });
+                }}
+              />
+              <StepUploads
+                form={form!}
+                onAutoSave={(notes) => {
+                  setLocalStepData((prev: any) => ({ ...prev, uploads: notes }));
+                  saveStep.mutate({ stepIndex: 3, data: { uploads: notes }, currentStep: 3 });
+                }}
+              />
+            </Stack>
           )}
 
-          {activeStep === 3 && (
-            <StepUploads
-              form={form!}
-              onAutoSave={(notes) => {
-                setLocalStepData((prev: any) => ({ ...prev, uploads: notes }));
-                saveStep.mutate({ stepIndex: 3, data: { uploads: notes }, currentStep: 4 });
-              }}
-            />
-          )}
+          {activeStep === 3 && <StepReview form={form!} onSubmit={() => submit.mutate()} />}
 
-          {activeStep === 4 && <StepReview form={form!} onSubmit={() => submit.mutate()} />}
-
-                    <Card>
+          <Card>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
                 <Button variant="outlined" onClick={goBack} disabled={activeStep === 0}>

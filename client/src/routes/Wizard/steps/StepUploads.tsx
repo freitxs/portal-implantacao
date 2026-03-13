@@ -16,7 +16,7 @@ import {
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import type { OnboardingForm, Upload, UploadType } from "../../../types";
-import { api, API_URL } from "../../../lib/api";
+import { api } from "../../../lib/api";
 import { useToast } from "../../../components/ToastProvider";
 import { useMutation } from "@tanstack/react-query";
 import { UploadNotesSchema, type UploadNotesValues } from "../wizardTypes";
@@ -57,6 +57,22 @@ function UploadCard({
 }) {
   const { toast } = useToast();
   const [progress, setProgress] = React.useState<number | null>(null);
+
+  async function downloadUpload(uploadId: string, filename: string) {
+    const response = await api.get(`/api/uploads/download/${uploadId}`, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  }
 
   const up = useMutation({
     mutationFn: async (file: File) => {
@@ -134,7 +150,7 @@ function UploadCard({
                 </Typography>
               </Box>
               <Stack direction="row" spacing={1}>
-                <Button variant="outlined" component="a" href={`${API_URL}/api/uploads/download/${upload.id}`} target="_blank" rel="noreferrer">
+                <Button variant="outlined" onClick={() => downloadUpload(upload.id, upload.filename)}>
                   Baixar
                 </Button>
                 <Button variant="outlined" color="error" startIcon={<DeleteOutlineRoundedIcon />} onClick={() => del.mutate()}>

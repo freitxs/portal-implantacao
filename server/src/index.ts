@@ -28,7 +28,6 @@ app.use("/api/admin", adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const port = parseInt(process.env.PORT || env.PORT.toString(), 10);
-app.listen(port, "0.0.0.0", () => {
-  console.log(`[API] Listening on port ${port}`);
+app.listen(env.PORT, () => {
+  console.log(`API rodando em http://localhost:${env.PORT}`);
 });

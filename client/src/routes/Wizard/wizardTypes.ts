@@ -1,23 +1,26 @@
 import { z } from "zod";
 import type { Regime, PricingRow, Sector } from "../../types";
 
+const EmailUserSchema = z
+  .object({
+    name: z.string().max(120).optional().default(""),
+    email: z.string().max(200).optional().default(""),
+  })
+  .default({ name: "", email: "" });
+
 export const EmailSetupSchema = z
   .object({
-    emailProvider: z.string().max(120).optional().default(""),
-    users: z
-      .array(
-        z
-          .object({
-            name: z.string().max(120).optional().default(""),
-            email: z.string().max(200).optional().default(""),
-          })
-          .default({ name: "", email: "" })
-      )
-      .optional()
-      .default([{ name: "", email: "" }]),
+    providerOptions: z.array(z.string()).default([]),
+    providerOtherText: z.string().max(120).optional().default(""),
+    tiContactName: z.string().max(120).optional().default(""),
+    tiContactPhone: z.string().max(40).optional().default(""),
+    users: z.array(EmailUserSchema).optional().default([{ name: "", email: "" }]),
   })
   .default({
-    emailProvider: "",
+    providerOptions: [],
+    providerOtherText: "",
+    tiContactName: "",
+    tiContactPhone: "",
     users: [{ name: "", email: "" }],
   });
 
@@ -34,11 +37,9 @@ export const OfficeSchema = z.object({
 export type OfficeValues = z.infer<typeof OfficeSchema>;
 
 export const ProfileSchema = z.object({
-  regimes: z
-    .array(z.enum(["SIMPLES", "PRESUMIDO", "REAL"]))
+  regimes: z.array(z.enum(["SIMPLES", "PRESUMIDO", "REAL"]))
     .min(1, "Selecione ao menos um regime."),
-  sectors: z
-    .array(z.enum(["COMERCIO", "SERVICOS", "INDUSTRIA", "NAO_SEI"]))
+  sectors: z.array(z.enum(["COMERCIO", "SERVICOS", "INDUSTRIA", "NAO_SEI"]))
     .min(1, "Selecione ao menos um setor."),
 });
 export type ProfileValues = z.infer<typeof ProfileSchema>;
@@ -76,7 +77,7 @@ export const SystemsPageSchema = z
         financeiroBpo: { values: [], otherText: "" },
       }),
 
-    systemsComment: z.string().max(2000).optional().default(""),
+    systemsComment: z.string().max(1000).optional().default(""),
   })
   .default({
     systems: {
@@ -96,18 +97,16 @@ export type SystemsPageValues = z.infer<typeof SystemsPageSchema>;
 
 export const FactorsPageSchema = z
   .object({
-    servicesOffered: z.array(z.string()).default([]),
-    servicesComment: z.string().max(2000).optional().default(""),
     pricingFactors: z.array(z.string()).default([]),
-    pricingFactorsComment: z.string().max(2000).optional().default(""),
-    motivation: z.string().max(2000).optional().default(""),
+    pricingFactorsComment: z.string().max(1000).optional().default(""),
+    honorariumHighlights: z.array(z.string()).default([]),
+    expectation: z.string().max(1000).optional().default(""),
   })
   .default({
-    servicesOffered: [],
-    servicesComment: "",
     pricingFactors: [],
     pricingFactorsComment: "",
-    motivation: "",
+    honorariumHighlights: [],
+    expectation: "",
   });
 
 export type FactorsPageValues = z.infer<typeof FactorsPageSchema>;

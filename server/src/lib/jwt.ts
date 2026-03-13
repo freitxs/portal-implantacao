@@ -7,14 +7,17 @@ const AccessPayloadSchema = z.object({
   role: z.enum(["ADMIN", "CLIENT"]),
 });
 
-export type AccessPayload = z.infer<typeof AccessPayloadSchema>;
+export type AccessPayload = {
+  sub: string;
+  role: string;
+};
 
-export function signAccessToken(payload: AccessPayload, expiresIn: string = "4h") {
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET as any, { expiresIn } as any);
+export function signAccessToken(payload: AccessPayload, expiresIn: jwt.SignOptions["expiresIn"] = "4h") {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn });
 }
 
-export function signRefreshToken(payload: { sub: string }, expiresIn: string = "30d") {
-  return jwt.sign(payload, env.JWT_REFRESH_SECRET as any, { expiresIn } as any);
+export function signRefreshToken(payload: { sub: string }, expiresIn: jwt.SignOptions["expiresIn"] = "30d") {
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn });
 }
 
 export function verifyAccessToken(token: string) {

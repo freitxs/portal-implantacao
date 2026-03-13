@@ -35,7 +35,7 @@ model RefreshSession {
 model OnboardingForm {
   id          String   @id @default(cuid())
   userId      String
-  status      String   @default("RASCUNHO") // RASCUNHO | ENVIADO
+  status      String   @default("RASCUNHO")
   currentStep Int      @default(0)
   stepData    String   @default("{}")
   createdAt   DateTime @default(now())

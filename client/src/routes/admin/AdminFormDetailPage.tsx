@@ -26,7 +26,6 @@ export function AdminFormDetailPage() {
   const emailProvider: string = emailStep.emailProvider ?? "";
   const emailUsers: Array<{ name?: string; email?: string }> = Array.isArray(emailStep.users) ? emailStep.users : [];
 
-
   const page1 = form?.stepData?.page1 ?? {};
   const systems = page1.systems ?? {};
   const systemsComment: string = page1.systemsComment ?? "";
@@ -45,6 +44,22 @@ export function AdminFormDetailPage() {
 
   const contract = uploads.find((u: any) => u?.type === "CONTRATO");
   const proposal = uploads.find((u: any) => u?.type === "PROPOSTA");
+
+  async function downloadUpload(uploadId: string, filename: string) {
+    const response = await api.get(`/api/uploads/download/${uploadId}`, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  }
 
   if (q.isLoading) {
     return (
@@ -245,9 +260,13 @@ export function AdminFormDetailPage() {
               <Typography color="text.secondary">
                 <strong>Contrato:</strong>{" "}
                 {contract ? (
-                  <a href={`${API_URL}${contract.path}`} target="_blank" rel="noreferrer">
+                  <Button
+                    variant="text"
+                    onClick={() => downloadUpload(contract.id, contract.filename)}
+                    sx={{ p: 0, minWidth: "auto", textTransform: "none" }}
+                  >
                     {contract.filename}
-                  </a>
+                  </Button>
                 ) : uploadNotes?.noContractTemplate ? (
                   "Não possuo template."
                 ) : (
@@ -257,9 +276,13 @@ export function AdminFormDetailPage() {
               <Typography color="text.secondary">
                 <strong>Proposta:</strong>{" "}
                 {proposal ? (
-                  <a href={`${API_URL}${proposal.path}`} target="_blank" rel="noreferrer">
+                  <Button
+                    variant="text"
+                    onClick={() => downloadUpload(proposal.id, proposal.filename)}
+                    sx={{ p: 0, minWidth: "auto", textTransform: "none" }}
+                  >
                     {proposal.filename}
-                  </a>
+                  </Button>
                 ) : uploadNotes?.noProposalTemplate ? (
                   "Não possuo template."
                 ) : (
