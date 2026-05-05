@@ -74,19 +74,36 @@ function countSelections(form: AnyForm) {
   return total;
 }
 
+async function fetchAllAdminForms() {
+  const pageSize = 100;
+  let page = 1;
+  let total = 0;
+  let allForms: AnyForm[] = [];
+
+  do {
+    const res = await api.get("/api/admin/forms", {
+      params: { page, pageSize },
+    });
+
+    const data = res.data;
+    const forms = Array.isArray(data) ? data : Array.isArray(data?.forms) ? data.forms : [];
+    total = Number(data?.total ?? forms.length ?? 0);
+    allForms = [...allForms, ...forms];
+
+    if (Array.isArray(data)) break;
+    page += 1;
+  } while (allForms.length < total);
+
+  return allForms as AnyForm[];
+}
+
 export function AdminFormsPage() {
   const nav = useNavigate();
   const [qText, setQText] = useState("");
 
   const q = useQuery({
     queryKey: ["adminForms"],
-    queryFn: async () => {
-      const res = await api.get("/api/admin/forms");
-      const data = res.data;
-
-      const forms = Array.isArray(data) ? data : Array.isArray(data?.forms) ? data.forms : [];
-      return forms as AnyForm[];
-    },
+    queryFn: fetchAllAdminForms,
   });
 
   const forms = q.data ?? [];
