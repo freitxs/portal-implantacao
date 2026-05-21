@@ -4,45 +4,63 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: "#0c972a" },
-    secondary: { main: "#16A34A" },
+    primary: { main: "#0f5b3b" },
+    secondary: { main: "#d7a84a" },
     background: {
-      default: "#F5F7FB",
+      default: "#f2f1ec",
       paper: "#FFFFFF",
     },
     text: {
-      primary: "#0B1220",
-      secondary: "#475467",
+      primary: "#142033",
+      secondary: "#5d6778",
     },
   },
   shape: { borderRadius: 16 },
   typography: {
-    fontFamily: ["Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Arial"].join(","),
-    h4: { fontWeight: 850, letterSpacing: -0.8 },
-    h5: { fontWeight: 850, letterSpacing: -0.6 },
-    h6: { fontWeight: 800, letterSpacing: -0.3 },
-    button: { textTransform: "none", fontWeight: 700 },
+    fontFamily: ["Manrope", "system-ui", "-apple-system", "Segoe UI", "sans-serif"].join(","),
+    h4: { fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.06 },
+    h5: { fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 },
+    h6: { fontWeight: 780, letterSpacing: -0.5, lineHeight: 1.12 },
+    body1: { fontSize: 15, lineHeight: 1.6 },
+    body2: { fontSize: 13.5, lineHeight: 1.55 },
+    button: { textTransform: "none", fontWeight: 750, letterSpacing: -0.2 },
   },
   shadows: [
     "none",
-    "0px 1px 2px rgba(16,24,40,0.06)",
-    "0px 4px 12px rgba(16,24,40,0.08)",
-    ...Array(22).fill("0px 10px 28px rgba(16,24,40,0.10)"),
+    "0px 2px 6px rgba(20,32,51,0.05)",
+    "0px 8px 18px rgba(20,32,51,0.08)",
+    ...Array(22).fill("0px 18px 44px rgba(20,32,51,0.08)"),
   ] as any,
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        ":root": {
+          colorScheme: "light",
+        },
+        body: {
+          background: "#f3f2ee",
+        },
+        "::selection": {
+          backgroundColor: "rgba(19,106,67,0.18)",
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {
           borderRadius: 18,
-          border: "1px solid rgba(16,24,40,0.06)",
-          boxShadow: "0px 12px 30px rgba(16,24,40,0.06)",
+          border: "1px solid rgba(20,32,51,0.08)",
+          boxShadow: "0px 22px 50px rgba(20,32,51,0.07)",
+          backgroundImage: "none",
+          backgroundColor: "#ffffff",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
-        root: { borderRadius: 14, paddingInline: 16, paddingBlock: 10 },
-        contained: { boxShadow: "0px 10px 20px rgba(30,94,255,0.20)" },
+        root: { borderRadius: 14, paddingInline: 18, paddingBlock: 10 },
+        contained: { boxShadow: "0px 14px 30px rgba(19,106,67,0.18)" },
+        outlined: { borderColor: "rgba(20,32,51,0.12)" },
       },
     },
     MuiTabs: {
@@ -64,7 +82,8 @@ const theme = createTheme({
     MuiTextField: { defaultProps: { size: "small" } },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 999, fontWeight: 700 },
+        root: { borderRadius: 14, fontWeight: 750 },
+        filled: { backgroundColor: "rgba(20,32,51,0.06)" },
       },
     },
   },

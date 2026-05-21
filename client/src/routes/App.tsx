@@ -1,21 +1,27 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "../state/AuthContext";
-import { ToastProvider } from "../components/ToastProvider";
-import { LoginPage } from "./LoginPage";
-import { WizardPage } from "./Wizard/WizardPage";
-import { MyFormsPage } from "./MyFormsPage";
-import { FormSummaryPage } from "./FormSummaryPage";
-import { AdminFormsPage } from "./admin/AdminFormsPage";
-import { AdminFormDetailPage } from "./admin/AdminFormDetailPage";
-import { AdminDashboardPage } from "./admin/AdminDashboardPage";
-import { AdminUsersPage } from "./admin/AdminUsersPage";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "../components/ProtectedRoute";
+import { ToastProvider } from "../components/ToastProvider";
+import { AuthProvider, useAuth } from "../state/AuthContext";
+import { FilesPage } from "./client/FilesPage";
+import { SchedulePage } from "./client/SchedulePage";
+import { TimelinePage } from "./client/TimelinePage";
+import { FormSummaryPage } from "./FormSummaryPage";
+import { HelpPage } from "./HelpPage";
+import { LoginPage } from "./LoginPage";
+import { MyFormsPage } from "./MyFormsPage";
+import { StageThreePage } from "./StageThreePage";
+import { StageTwoPage } from "./StageTwoPage";
+import { WizardPage } from "./Wizard/WizardPage";
+import { AdminDashboardPage } from "./admin/AdminDashboardPage";
+import { AdminFormDetailPage } from "./admin/AdminFormDetailPage";
+import { AdminFormsPage } from "./admin/AdminFormsPage";
+import { AdminUsersPage } from "./admin/AdminUsersPage";
 
 function IndexRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  return user.role === "ADMIN" ? <Navigate to="/admin" replace /> : <Navigate to="/meus-formularios" replace />;
+  return user.role === "ADMIN" ? <Navigate to="/admin" replace /> : <Navigate to="/inicio" replace />;
 }
 
 export function App() {
@@ -27,6 +33,24 @@ export function App() {
           <Route path="/" element={<IndexRedirect />} />
 
           <Route
+            path="/inicio"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <MyFormsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/meus-formularios"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <Navigate to="/inicio" replace />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/wizard/:formId"
             element={
               <ProtectedRoute role="CLIENT">
@@ -36,10 +60,28 @@ export function App() {
           />
 
           <Route
-            path="/meus-formularios"
+            path="/cronograma/:formId"
             element={
               <ProtectedRoute role="CLIENT">
-                <MyFormsPage />
+                <TimelinePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/arquivos/:formId"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <FilesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/agendamento/:formId"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <SchedulePage />
               </ProtectedRoute>
             }
           />
@@ -49,6 +91,33 @@ export function App() {
             element={
               <ProtectedRoute>
                 <FormSummaryPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/etapa-02/:formId"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <StageTwoPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/etapa-03/:formId"
+            element={
+              <ProtectedRoute role="CLIENT">
+                <StageThreePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ajuda"
+            element={
+              <ProtectedRoute>
+                <HelpPage />
               </ProtectedRoute>
             }
           />
@@ -80,7 +149,6 @@ export function App() {
             }
           />
 
-          {/* Gestão de usuários */}
           <Route
             path="/admin/users"
             element={
