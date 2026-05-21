@@ -1,1 +1,1 @@
-export function ClientHome(){return null}
+export { ClientHome } from "./client/ClientHome";

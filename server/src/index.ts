@@ -8,6 +8,7 @@ import meRoutes from "./routes/me.js";
 import formsRoutes from "./routes/forms.js";
 import uploadsRoutes from "./routes/uploads.js";
 import adminRoutes from "./routes/admin.js";
+import schedulesRoutes from "./routes/schedules.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/auth", meRoutes);
 app.use("/api/forms", formsRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/schedules", schedulesRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

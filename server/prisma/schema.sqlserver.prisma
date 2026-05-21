@@ -18,6 +18,10 @@ model User {
 
   forms        OnboardingForm[]
   sessions     RefreshSession[]
+  fileLogs     FileLog[]
+  createdAppointments Appointment[] @relation("AppointmentCreatedBy")
+  stageAcceptances StageAcceptance[] @relation("StageAcceptanceAcceptedBy")
+  implementationLogs ImplementationLog[]
 }
 
 model RefreshSession {
@@ -46,9 +50,69 @@ model OnboardingForm {
   uploads     Upload[]
   history     SaveHistory[]
   users       OnboardingUser[]
+  fileLogs    FileLog[]
+  appointment Appointment?
+  stageAcceptances StageAcceptance[]
+  implementationLogs ImplementationLog[]
 
   @@index([userId])
   @@index([status])
+}
+
+model Appointment {
+  id                       String   @id @default(cuid())
+  formId                   String   @unique
+  startAt                  DateTime
+  endAt                    DateTime
+  status                   String   @default("RESERVADO")
+  createdByUserId          String
+  externalCalendarProvider String?
+  externalCalendarEventId  String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  form                      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  createdByUser             User           @relation("AppointmentCreatedBy", fields: [createdByUserId], references: [id])
+
+  @@index([startAt, endAt])
+  @@index([status, startAt])
+  @@index([createdByUserId])
+}
+
+model StageAcceptance {
+  id               String   @id @default(cuid())
+  formId           String
+  stageKey         String
+  status           String   @default("CONCLUIDA")
+  version          Int
+  summarySnapshot  String   @db.NVarChar(Max)
+  acceptedByUserId String
+  acceptedAt       DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  form             OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  acceptedByUser   User           @relation("StageAcceptanceAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([formId, stageKey, acceptedAt])
+  @@index([acceptedByUserId, acceptedAt])
+}
+
+model ImplementationLog {
+  id         String   @id @default(cuid())
+  formId     String
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   String   @default("{}") @db.NVarChar(Max)
+  createdAt  DateTime @default(now())
+
+  form       OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user       User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([formId, createdAt])
+  @@index([userId, createdAt])
+  @@index([entityType, createdAt])
 }
 
 model OnboardingUser {
@@ -87,11 +151,34 @@ model Upload {
   path      String   @db.NVarChar(Max)
   mimetype  String
   size      Int
+  status    String   @default("NAO_ENVIADO")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  logs      FileLog[]
+
+  @@unique([formId, type])
+}
+
+model FileLog {
+  id        String   @id @default(cuid())
+  formId    String
+  uploadId  String?
+  userId    String?
+  type      String
+  action    String
+  status    String
+  message   String?  @db.NVarChar(Max)
   createdAt DateTime @default(now())
 
   form      OnboardingForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  upload    Upload?        @relation(fields: [uploadId], references: [id], onDelete: SetNull)
+  user      User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  @@unique([formId, type])
+  @@index([formId, createdAt])
+  @@index([uploadId, createdAt])
+  @@index([type, createdAt])
 }
 
 model SaveHistory {

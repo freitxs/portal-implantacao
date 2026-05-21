@@ -12,12 +12,12 @@ export type AccessPayload = {
   role: string;
 };
 
-export function signAccessToken(payload: AccessPayload, expiresIn: jwt.SignOptions["expiresIn"] = "4h") {
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn });
+export function signAccessToken(payload: AccessPayload, expiresIn: string = "4h") {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: expiresIn as jwt.SignOptions["expiresIn"] });
 }
 
-export function signRefreshToken(payload: { sub: string }, expiresIn: jwt.SignOptions["expiresIn"] = "30d") {
-  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn });
+export function signRefreshToken(payload: { sub: string }, expiresIn: string = "30d") {
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: expiresIn as jwt.SignOptions["expiresIn"] });
 }
 
 export function verifyAccessToken(token: string) {

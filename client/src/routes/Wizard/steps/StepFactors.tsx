@@ -1,161 +1,187 @@
 import React from "react";
-import { Box, Card, CardContent, Checkbox, Divider, FormControlLabel, TextField, Typography } from "@mui/material";
-import { FactorsPageSchema, type FactorsPageValues } from "../wizardTypes";
+import { Box, Card, CardContent, Checkbox, Divider, FormControl, FormControlLabel, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { EXPECTATION_OPTIONS, FactorsPageDraftSchema, type FactorsPageDraftValues } from "../wizardTypes";
 
 const FACTORS = [
   "Tributação",
   "Atividade",
-  "Quantidade de colaboradores",
-  "Quantidade de lançamentos contábeis",
-  "Quantidade de lançamentos fiscais",
-  "Faturamento mensal/anual",
-  "Sistemas integrados (cliente e contabilidade)",
-  "Apuração externa (ERP do cliente)",
-  "Quantidade de instituições",
-  "OUTRO",
-];
-
-const HIGHLIGHTS = [
-  "Facilidade para Gerar Propostas",
-  "Portal de Contratos Integrado",
-  "Padronização e Automação da Precificação",
-  "Pacotes de Benefícios Personalizados",
-  "Profissionalização do Processo Comercial",
-  "Melhor Posicionamento no Mercado",
-  "Acompanhar a Jornada dos Clientes",
+  "Colaboradores",
+  "Lançamentos fiscais",
+  "Lançamentos contábeis",
+  "Faturamento",
+  "Sistemas integrados",
+  "Apuração externa",
+  "Complexidade operacional",
+  "Atendimento consultivo",
+  "Outro",
 ];
 
 function toggleInList(list: string[], value: string) {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+  return list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
 }
 
 export function StepFactors({
   defaultValues,
   onAutoSave,
+  onDraftChange,
 }: {
   defaultValues: any;
-  onAutoSave: (data: FactorsPageValues) => void;
+  onAutoSave: (data: FactorsPageDraftValues) => void;
+  onDraftChange?: (data: FactorsPageDraftValues) => void;
 }) {
-  const initial = FactorsPageSchema.parse(defaultValues ?? {});
-  const [data, setData] = React.useState<FactorsPageValues>(initial);
+  const normalizeDraft = React.useCallback((input: any) => {
+    const parsedDefaultValues = FactorsPageDraftSchema.parse(input ?? {});
+    return {
+      ...parsedDefaultValues,
+      pricingFactors: (parsedDefaultValues.pricingFactors ?? []).map((item) => (item === "OUTRO" ? "Outro" : item)),
+    };
+  }, []);
+  const [data, setData] = React.useState<FactorsPageDraftValues>(() => normalizeDraft(defaultValues));
+  const initialSerializedRef = React.useRef(JSON.stringify(normalizeDraft(defaultValues)));
+  const lastLoadedRef = React.useRef(initialSerializedRef.current);
+  const lastSavedRef = React.useRef(initialSerializedRef.current);
 
   React.useEffect(() => {
-    const t = setTimeout(() => {
-      const ok = FactorsPageSchema.safeParse(data);
-      if (ok.success) onAutoSave(ok.data);
-    }, 700);
-    return () => clearTimeout(t);
-  }, [JSON.stringify(data)]);
+    const next = normalizeDraft(defaultValues);
+    const serialized = JSON.stringify(next);
+    if (serialized !== lastLoadedRef.current) {
+      lastLoadedRef.current = serialized;
+      lastSavedRef.current = serialized;
+      setData(next);
+    }
+  }, [defaultValues, normalizeDraft]);
 
-  const factorsSelected = (data.pricingFactors ?? []).includes("OUTRO");
+  React.useEffect(() => {
+    const normalized = {
+      ...data,
+      honorariumHighlights: data.expectation ? [data.expectation] : [],
+    };
+    const serialized = JSON.stringify(normalized);
+    onDraftChange?.(normalized);
+    if (serialized !== lastSavedRef.current) {
+      lastSavedRef.current = serialized;
+      onAutoSave(normalized);
+    }
+  }, [data, onAutoSave, onDraftChange]);
+
+  const hasOtherFactor = (data.pricingFactors ?? []).includes("Outro");
 
   return (
     <Card variant="outlined" sx={{ borderColor: "rgba(16,24,40,0.18)", borderWidth: 1.5 }}>
       <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
         <Typography variant="h5" sx={{ fontWeight: 900, mb: 0.5 }}>
-          Fatores e expectativa
+          Critérios de precificação e expectativa principal
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
-          Queremos entender como sua precificação funciona hoje e o que mais te encantou no Honorarium.
+          Selecione os critérios usados hoje e o principal resultado esperado com a implantação.
         </Typography>
 
         <Typography variant="h6" sx={{ fontWeight: 900, mb: 0.5 }}>
-          Quais aspectos são considerados ao precificar seus honorários?
+          Critérios de precificação
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
-          Marque os fatores que mais impactam sua precificação.
+          Escolha os pontos que hoje influenciam o honorário.
         </Typography>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 0.5 }}>
-          {FACTORS.map((f) => (
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, columnGap: 1.5, rowGap: 0.35 }}>
+          {FACTORS.map((factor) => (
             <FormControlLabel
-              key={f}
+              key={factor}
               control={
                 <Checkbox
-                  checked={data.pricingFactors.includes(f)}
+                  checked={(data.pricingFactors ?? []).includes(factor)}
                   onChange={() =>
                     setData((prev) => {
-                      const next = toggleInList(prev.pricingFactors, f);
-                      const nextOtherText = next.includes("OUTRO") ? prev.pricingFactorsComment : prev.pricingFactorsComment;
-                      return { ...prev, pricingFactors: next, pricingFactorsComment: nextOtherText };
+                      const nextFactors = toggleInList(prev.pricingFactors ?? [], factor);
+                      return {
+                        ...prev,
+                        pricingFactors: nextFactors,
+                        pricingFactorsOtherText: nextFactors.includes("Outro") ? prev.pricingFactorsOtherText : "",
+                      };
                     })
                   }
                 />
               }
-              label={f === "OUTRO" ? "Outro" : f}
-              sx={{ m: 0 }}
+              label={factor}
+              slotProps={{
+                typography: {
+                  sx: {
+                    fontSize: 13.25,
+                    lineHeight: 1.4,
+                    overflowWrap: "anywhere",
+                  },
+                },
+              }}
+              sx={{ m: 0, pr: 0.5 }}
             />
           ))}
         </Box>
 
-        {factorsSelected ? (
-          <Box sx={{ mt: 1.75 }}>
-            <TextField
-              label="Outro fator importante"
-              fullWidth
-              value={(data as any).pricingFactorsOtherText ?? ""}
-              onChange={(e) => setData((prev) => ({ ...(prev as any), pricingFactorsOtherText: e.target.value }))}
-            />
-          </Box>
+        {hasOtherFactor ? (
+          <TextField
+            fullWidth
+            label="Informe o outro critério"
+            sx={{ mt: 1.75 }}
+            value={data.pricingFactorsOtherText ?? ""}
+            onChange={(event) => setData((prev) => ({ ...prev, pricingFactorsOtherText: event.target.value }))}
+          />
         ) : null}
 
         <Box sx={{ mt: 2.25 }}>
           <Typography variant="body1" sx={{ fontWeight: 800, mb: 1 }}>
-            Comentários
+            Observações complementares
           </Typography>
           <TextField
             fullWidth
             multiline
             minRows={2}
+            placeholder="Use este campo apenas se houver uma particularidade relevante."
             value={data.pricingFactorsComment ?? ""}
-            onChange={(e) => setData((prev) => ({ ...prev, pricingFactorsComment: e.target.value }))}
-            placeholder="Observações pontuais sobre sua lógica de precificação"
+            onChange={(event) => setData((prev) => ({ ...prev, pricingFactorsComment: event.target.value }))}
           />
         </Box>
 
         <Divider sx={{ my: 3 }} />
 
         <Typography variant="h6" sx={{ fontWeight: 900, mb: 0.5 }}>
-          O que te encantou no Honorarium?
+          Expectativa principal
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
-          Selecione os pontos que mais fizeram sentido para você.
+          Escolha o resultado principal esperado nesta implantação.
         </Typography>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 0.5 }}>
-          {HIGHLIGHTS.map((item) => (
-            <FormControlLabel
-              key={item}
-              control={
-                <Checkbox
-                  checked={(data.honorariumHighlights ?? []).includes(item)}
-                  onChange={() =>
-                    setData((prev) => ({
-                      ...prev,
-                      honorariumHighlights: toggleInList(prev.honorariumHighlights ?? [], item),
-                    }))
-                  }
-                />
-              }
-              label={item}
-              sx={{ m: 0 }}
-            />
-          ))}
-        </Box>
-
-        <Box sx={{ mt: 2.25 }}>
-          <Typography variant="body1" sx={{ fontWeight: 800, mb: 1 }}>
-            Qual sua expectativa?
-          </Typography>
-          <TextField
-            placeholder="Conte brevemente o que você espera da implantação e da utilização do Honorarium"
-            multiline
-            minRows={3}
-            fullWidth
+        <FormControl sx={{ width: "100%" }}>
+          <RadioGroup
             value={data.expectation ?? ""}
-            onChange={(e) => setData((prev) => ({ ...prev, expectation: e.target.value }))}
-          />
-        </Box>
+            onChange={(event) =>
+              setData((prev) => ({
+                ...prev,
+                expectation: event.target.value as FactorsPageDraftValues["expectation"],
+                honorariumHighlights: [event.target.value],
+              }))
+            }
+            sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, columnGap: 1.5, rowGap: 0.35 }}
+          >
+            {EXPECTATION_OPTIONS.map((option) => (
+              <FormControlLabel
+                key={option}
+                value={option}
+                control={<Radio />}
+                label={option}
+                slotProps={{
+                  typography: {
+                    sx: {
+                      fontSize: 13.25,
+                      lineHeight: 1.4,
+                      overflowWrap: "anywhere",
+                    },
+                  },
+                }}
+                sx={{ m: 0, pr: 0.5 }}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
       </CardContent>
     </Card>
   );
