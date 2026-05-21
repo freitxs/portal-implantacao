@@ -197,8 +197,13 @@ export function AdminFormsPage() {
                       <TableCell>{trainingStatusLabel((form as any).trainingStatus)}</TableCell>
                       <TableCell>{form.updatedAt ? dayjs(form.updatedAt).format("DD/MM/YYYY HH:mm") : ""}</TableCell>
                       <TableCell align="right">
-                        <Button size="small" variant="outlined" onClick={() => nav(`/admin/forms/${form.id}`)}>
-                          Abrir
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          disabled={!(form as any).hasForm}
+                          onClick={() => nav(`/admin/forms/${form.id}`)}
+                        >
+                          {(form as any).hasForm ? "Abrir" : "Sem formulário"}
                         </Button>
                       </TableCell>
                     </TableRow>

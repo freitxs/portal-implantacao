@@ -77,7 +77,7 @@ router.use(requireAuth, requireAdmin);
 
 router.get("/stats", async (_req, res, next) => {
   try {
-    const [forms, appointments] = await Promise.all([
+    const [forms, appointments, clientUsersCount] = await Promise.all([
       prisma.onboardingForm.findMany({
         include: {
           uploads: { select: { type: true, status: true } },
@@ -88,6 +88,9 @@ router.get("/stats", async (_req, res, next) => {
         where: { status: { in: ["RESERVADO", "CONFIRMADO_EQUIPE", "REAGENDADO"] } },
         select: { id: true },
       }),
+      prisma.user.count({
+        where: { role: "CLIENT" },
+      }),
     ]);
 
     const summaries = forms.map((form) => getStageSummary(form));
@@ -97,7 +100,7 @@ router.get("/stats", async (_req, res, next) => {
 
     res.json({
       stats: {
-        clientsInTrail: forms.length,
+        clientsInTrail: clientUsersCount,
         awaitingAnalysis,
         trainingsReserved: appointments.length,
         acceptancesPending,
@@ -152,44 +155,106 @@ router.get("/forms", async (req, res, next) => {
 
     if (q.search) {
       where.OR = [
-        { user: { name: { contains: q.search, mode: "insensitive" } } },
+        { user: { name: { contains: q.search } } },
         { stepData: { contains: q.search } },
       ];
     }
 
-    const forms = await prisma.onboardingForm.findMany({
-      where,
-      include: {
-        user: { select: { id: true, name: true, email: true, role: true } },
-        uploads: { select: { type: true, status: true, filename: true, createdAt: true, updatedAt: true } },
-        appointment: {
-          select: {
-            id: true,
-            status: true,
-            startAt: true,
-            endAt: true,
-            updatedAt: true,
-            createdAt: true,
-            formId: true,
-            createdByUserId: true,
+    const [forms, clientUsers] = await Promise.all([
+      prisma.onboardingForm.findMany({
+        where,
+        include: {
+          user: { select: { id: true, name: true, email: true, role: true, createdAt: true } },
+          uploads: { select: { type: true, status: true, filename: true, createdAt: true, updatedAt: true } },
+          appointment: {
+            select: {
+              id: true,
+              status: true,
+              startAt: true,
+              endAt: true,
+              updatedAt: true,
+              createdAt: true,
+              formId: true,
+              createdByUserId: true,
+            },
+          },
+          stageAcceptances: {
+            select: { id: true, stageKey: true, status: true, version: true, acceptedAt: true, createdAt: true, acceptedByUserId: true },
+            orderBy: { acceptedAt: "desc" },
+            take: 5,
           },
         },
-        stageAcceptances: {
-          select: { id: true, stageKey: true, status: true, version: true, acceptedAt: true, createdAt: true, acceptedByUserId: true },
-          orderBy: { acceptedAt: "desc" },
-          take: 5,
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.user.findMany({
+        where: {
+          role: "CLIENT",
+          ...(q.search
+            ? {
+                OR: [
+                  { name: { contains: q.search } },
+                  { email: { contains: q.search } },
+                ],
+              }
+            : {}),
         },
-      },
-      orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true, email: true, role: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    const latestFormByUserId = new Map<string, any>();
+    for (const form of forms as any[]) {
+      if (!latestFormByUserId.has(form.userId)) {
+        const normalizedForm = { ...form, stepData: safeJsonParse(form.stepData, {}) };
+        const summary = getStageSummary(normalizedForm);
+        latestFormByUserId.set(form.userId, { ...normalizedForm, ...summary, hasForm: true });
+      }
+    }
+
+    const mergedByUserId = new Map<string, any>();
+
+    for (const user of clientUsers) {
+      const latestForm = latestFormByUserId.get(user.id);
+
+      if (latestForm) {
+        mergedByUserId.set(user.id, latestForm);
+        continue;
+      }
+
+      mergedByUserId.set(user.id, {
+        id: `legacy-user-${user.id}`,
+        userId: user.id,
+        user,
+        status: null,
+        currentStep: 0,
+        stepData: {},
+        uploads: [],
+        appointment: null,
+        stageAcceptances: [],
+        createdAt: user.createdAt,
+        updatedAt: user.createdAt,
+        currentStageKey: "ETAPA_01",
+        stageStatus: "NAO_INICIADA",
+        trainingStatus: "NAO_DISPONIVEL",
+        needsAcceptance: false,
+        hasAdjustment: false,
+        hasForm: false,
+      });
+    }
+
+    for (const latestForm of latestFormByUserId.values()) {
+      if (!mergedByUserId.has(latestForm.userId)) {
+        mergedByUserId.set(latestForm.userId, latestForm);
+      }
+    }
+
+    const merged = Array.from(mergedByUserId.values()).sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
 
-    const normalized = (forms as any[]).map((form) => {
-      const normalizedForm = { ...form, stepData: safeJsonParse(form.stepData, {}) };
-      const summary = getStageSummary(normalizedForm);
-      return { ...normalizedForm, ...summary };
-    });
-
-    const filtered = normalized.filter((form) => {
+    const filtered = merged.filter((form) => {
+      if (q.status && (!form.hasForm || form.status !== q.status)) return false;
       if (q.currentStage && form.currentStageKey !== q.currentStage) return false;
       if (q.trainingStatus && form.trainingStatus !== q.trainingStatus) return false;
       return true;

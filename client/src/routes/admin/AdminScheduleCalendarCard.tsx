@@ -393,7 +393,9 @@ export function AdminScheduleCalendarCard({
                       }}
                     >
                       <Stack spacing={0.3} sx={{ textAlign: "left" }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: 15.5 }}>{slot.label}</Typography>
+                        <Typography sx={{ fontWeight: 800, fontSize: 15.5 }}>
+                          {`${dayjs(slot.startAt).format("HH:mm")} às ${dayjs(slot.endAt).format("HH:mm")}`}
+                        </Typography>
                         <Typography sx={{ fontSize: 12.8, color: "text.secondary" }}>
                           {slot.available ? "Bloco padrão disponível para reserva." : "Bloco ocupado por reserva ou sobreposição existente."}
                         </Typography>

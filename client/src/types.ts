@@ -178,6 +178,7 @@ export type OnboardingForm = {
   userId: string;
   status: FormStatus;
   currentStep: number;
+  hasForm?: boolean;
   currentStageKey?: "ETAPA_01" | "ETAPA_02" | "ETAPA_03";
   stageStatus?: StageStatus | string;
   trainingStatus?: AppointmentStatus | string;
