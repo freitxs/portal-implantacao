@@ -79,7 +79,7 @@ function HistoryList({ logs }: { logs: FileLog[] }) {
   return (
     <Stack spacing={1}>
       {logs.length ? logs.map((log) => (
-        <Box key={log.id} sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 1.5 }}>
+        <Box key={log.id} sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 1.5 }}>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1} justifyContent="space-between">
             <Typography sx={{ fontWeight: 800 }}>{statusLabels[log.status]}</Typography>
             <Typography color="text.secondary" sx={{ fontSize: 13 }}>
@@ -273,7 +273,7 @@ export function FilesPage() {
               </Stack>
 
               <Box sx={{ mt: 2.5, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", xl: "1.15fr 0.85fr" } }}>
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Arquivo atual</Typography>
                   {proposalUpload ? (
                     <Stack spacing={1.25}>
@@ -308,7 +308,7 @@ export function FilesPage() {
                   )}
                 </Box>
 
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Caso não possua modelo próprio</Typography>
                   <FormControlLabel
                     control={
@@ -346,7 +346,7 @@ export function FilesPage() {
                             key={item.id}
                             sx={{
                               border: selected ? "1px solid rgba(19,78,54,0.35)" : "1px solid rgba(15,23,42,0.08)",
-                              borderRadius: 4,
+                              borderRadius: "20px",
                               p: 2,
                               backgroundColor: selected ? "rgba(19,78,54,0.04)" : "transparent",
                             }}
@@ -417,7 +417,7 @@ export function FilesPage() {
               </Stack>
 
               <Box sx={{ mt: 2.5, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", xl: "1.15fr 0.85fr" } }}>
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Arquivo atual</Typography>
                   {contractUpload ? (
                     <Stack spacing={1.25}>
@@ -452,7 +452,7 @@ export function FilesPage() {
                   )}
                 </Box>
 
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Caso não tenha modelo próprio</Typography>
                   <FormControlLabel
                     control={
@@ -476,7 +476,7 @@ export function FilesPage() {
                     slotProps={{ typography: { sx: { lineHeight: 1.4, overflowWrap: "anywhere" } } }}
                   />
                   {uploadsState.noContractTemplate ? (
-                    <Box sx={{ mt: 1.5, border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2 }}>
+                    <Box sx={{ mt: 1.5, border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2 }}>
                       <Typography sx={{ fontWeight: 800 }}>{HONORARIUM_CONTRACT_TEMPLATE.name}</Typography>
                       <Typography color="text.secondary" sx={{ mt: 0.5 }}>
                         {HONORARIUM_CONTRACT_TEMPLATE.description}
@@ -532,7 +532,7 @@ export function FilesPage() {
               </Stack>
 
               <Box sx={{ mt: 2.5, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", xl: "1.15fr 0.85fr" } }}>
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Modelo atualizado</Typography>
                   <Typography color="text.secondary" sx={{ mb: 1.5 }}>
                     Baixe o modelo, preencha os campos solicitados e faça o envio em CSV ou XLSX.
@@ -542,7 +542,7 @@ export function FilesPage() {
                   </Button>
                 </Box>
 
-                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: 4, p: 2.25 }}>
+                <Box sx={{ border: "1px solid rgba(15,23,42,0.08)", borderRadius: "20px", p: 2.25 }}>
                   <Typography sx={{ fontWeight: 800, mb: 1 }}>Upload da planilha preenchida</Typography>
                   {clientsUpload ? (
                     <Stack spacing={1.25}>

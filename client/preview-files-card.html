@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Files Card Preview</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: start center;
+        background:
+          radial-gradient(circle at top left, rgba(219, 234, 254, 0.45), transparent 32%),
+          linear-gradient(180deg, #f7f8fb 0%, #f4f7f6 100%);
+        color: #0f172a;
+        padding: 28px;
+      }
+
+      .frame {
+        width: 1120px;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 22px 70px rgba(15, 23, 42, 0.08);
+        padding: 24px 28px 32px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .header-main {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+
+      .icon {
+        width: 22px;
+        height: 22px;
+        border: 2px solid rgba(15, 23, 42, 0.5);
+        border-radius: 4px;
+        margin-top: 2px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+        font-weight: 900;
+      }
+
+      p {
+        margin: 8px 0 0;
+        color: #64748b;
+        font-size: 15px;
+      }
+
+      .chip-row {
+        margin-top: 14px;
+      }
+
+      .chip,
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 14px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        font-size: 14px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .status-chip {
+        align-self: center;
+      }
+
+      .upload-card {
+        margin-top: 22px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 20px;
+        padding: 20px 20px 18px;
+        background: #fff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
+      }
+
+      .upload-card h2 {
+        margin: 0 0 10px;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .upload-card .help {
+        margin: 0 0 16px;
+        font-size: 15px;
+      }
+
+      .button {
+        width: 100%;
+        border: 0;
+        border-radius: 16px;
+        background: #16663f;
+        color: #fff;
+        min-height: 46px;
+        font-size: 15px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .button-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        display: inline-grid;
+        place-items: center;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="frame">
+      <section class="header">
+        <div class="header-main">
+          <div class="icon"></div>
+          <div>
+            <h1>Modelo de proposta comercial</h1>
+            <p>Base utilizada para organizar a proposta comercial da implantação.</p>
+            <div class="chip-row">
+              <span class="chip">Necessário para avançar</span>
+            </div>
+          </div>
+        </div>
+        <span class="status-chip">Não enviado</span>
+      </section>
+
+      <section class="upload-card">
+        <h2>Arquivo atual</h2>
+        <p class="help">Você pode enviar um modelo próprio ou escolher um modelo Honorarium.</p>
+        <button class="button" type="button">
+          <span class="button-icon">↑</span>
+          Enviar modelo próprio
+        </button>
+      </section>
+    </main>
+  </body>
+</html>
